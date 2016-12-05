@@ -98,9 +98,9 @@ def read_cmist_zip(fname):
     out['vel'] = np.empty((3, nrows, ncols), dtype=np.float32)
     out.update(**meta)
     for idx in range(nrows):
-        out['vel'][0, idx, :] = dtmp[idx]['VEL_EAST']
-        out['vel'][1, idx, :] = dtmp[idx]['VEL_NORTH']
-        out['vel'][2, idx, :] = dtmp[idx]['VEL_VERT']
+        out['vel'][0, idx, :] = dtmp[idx]['VEL_EAST'] / 100.
+        out['vel'][1, idx, :] = dtmp[idx]['VEL_NORTH'] / 100.
+        out['vel'][2, idx, :] = dtmp[idx]['VEL_VERT'] / 100.
     return out
 
 
