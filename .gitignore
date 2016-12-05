@@ -2,3 +2,6 @@
 *.pyc
 .cache
 tmp/
+*.bak
+*.pkl.*
+*.json.*
