@@ -74,6 +74,38 @@ def read_metadata(fl):
     return out
 
 
+def align_time(time0, time1):
+    """
+    Make sure the two time vectors align. If they don't, step through
+    and find the matches.
+
+    This function assumes that `time0` is correct, and that `time1` may
+    have gaps.
+
+    This function returns an 'indexing object' (either a `slice`, or a
+    boolean array).
+    """
+    # First we check if the two times are the same.
+    if np.array_equal(time0, time1):
+        # If they are, we just return a "slice-all" object.
+        return slice(None)
+    # Otherwise, we need to find the ones that match...
+    # Here I create a 'boolean array' (see: http://tinyurl.com/hx3f49n)
+    out = np.zeros(len(time0), dtype=bool)
+    # idx1 and idx0 are index (a.k.a. 'counting') variables that keep
+    # track of position in each array
+    idx1 = 0
+    for idx0 in range(len(time0)):
+        # `idx0` is always stepped forward 1
+        if time0[idx0] == time1[idx1]:
+            # Match! So, we can set this index to 'good'
+            out[idx0] = True
+            idx1 += 1  # advance the 'count' for time1
+            # Otherwise, we DO NOT advance this count.
+            # I don't need an 'else' statement here
+    return out
+
+
 def read_cmist_zip(fname):
     fnm = fname.split('/')[-1].split('.')[0]
     dtmp = {}
@@ -90,17 +122,22 @@ def read_cmist_zip(fname):
                 with zfl.open(nm) as fl:
                     hdr = read_header(fl)
     nrows = len(dtmp)
-    ncols = len(dtmp[0])
     out = base.veldata()
     out['time'] = hdr['DATE_TIME']
+    ncols = len(out['time'])
     for nm in ['HEADING', 'PITCH', 'ROLL', 'TEMPERATURE', 'PRESSURE', 'DEPTH']:
         out[nm.lower()] = hdr[nm]
-    out['vel'] = np.empty((3, nrows, ncols), dtype=np.float32)
+    # We default the 'vel' array to be np.NaN (not-a-number), so that
+    # values we don't assign below, have this value.
+    out['vel'] = np.empty((3, nrows, ncols), dtype=np.float32) * np.NaN
     out.update(**meta)
     for idx in range(nrows):
-        out['vel'][0, idx, :] = dtmp[idx]['VEL_EAST'] / 100.
-        out['vel'][1, idx, :] = dtmp[idx]['VEL_NORTH'] / 100.
-        out['vel'][2, idx, :] = dtmp[idx]['VEL_VERT'] / 100.
+        inds = align_time(out['time'], dtmp[idx]['DATE_TIME'])
+        # inds is either the `slice-all` (equivalent to a ":"), or the boolean array
+        # If the latter, only the values that are 'True' get assigned from the right to left
+        out['vel'][0, idx, inds] = dtmp[idx]['VEL_EAST'] / 100.
+        out['vel'][1, idx, inds] = dtmp[idx]['VEL_NORTH'] / 100.
+        out['vel'][2, idx, inds] = dtmp[idx]['VEL_VERT'] / 100.
     return out
 
 
