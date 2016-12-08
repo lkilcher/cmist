@@ -8,7 +8,9 @@ from web_io import load_from_web
 def load_from_cache(idx):
     fname = base.cache_dir + idx + '.mat'
     if os.path.isfile(fname):
-        return base.veldata(loadmat(fname, squeeze_me=True))
+        out = base.veldata(loadmat(fname, squeeze_me=True))
+        out['time'] = out['time'].astype('datetime64[m]')
+        return out
     return None
 
 
