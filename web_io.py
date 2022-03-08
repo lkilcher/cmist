@@ -6,6 +6,7 @@ import numpy as np
 import time
 from . import base
 import os
+from xarray import Dataset
 
 
 # This is just a pointer (holds a slot in memory)
@@ -137,7 +138,7 @@ def read_cmist_zip(fname):
                 with zfl.open(nm) as fl:
                     hdr = read_header(fl)
     nrows = len(dtmp)
-    out = base.veldata()
+    out = dict()
     out['time'] = hdr['DATE_TIME']
     ncols = len(out['time'])
     for nm in ['HEADING', 'PITCH', 'ROLL', 'TEMPERATURE', 'PRESSURE', 'DEPTH']:
@@ -153,7 +154,38 @@ def read_cmist_zip(fname):
         out['vel'][0, idx, inds] = dtmp[idx]['VEL_EAST'] / 100.
         out['vel'][1, idx, inds] = dtmp[idx]['VEL_NORTH'] / 100.
         out['vel'][2, idx, inds] = dtmp[idx]['VEL_VERT'] / 100.
-    return out
+    dset = Dataset(
+        data_vars=dict(
+            vel=(['ENU', 'z', 'time',], out.pop('vel')),
+            pressure=(['time'], out.pop('pressure')),
+            temperature=(['time'], out.pop('temperature')),
+            depth=(['time'], out.pop('depth')),
+            heading=(['time'], out.pop('heading')),
+            pitch=(['time'], out.pop('pitch')),
+            roll=(['time'], out.pop('roll')),
+        ), 
+        coords=dict(
+            ENU=(['ENU'], ['East', 'North', 'Up']),
+            time=(['time'], out.pop('time')),
+            z=(['z'], out.pop('z'))
+        ),
+    )
+    dset['vel'].attrs['units'] = 'm/s'
+    dset['temperature'].attrs['units'] = 'Celsius'
+    dset['heading'].attrs['units'] = 'degrees'
+    dset['pitch'].attrs['units'] = 'degrees'
+    dset['roll'].attrs['units'] = 'degrees'
+    dset['pressure'].attrs['units'] = 'dBar'
+    dset['depth'].attrs['units'] = 'm'
+    dset['z'].attrs['units'] = 'm (relative to sea level)'
+    dset['time'].attrs['timezone'] = 'UTC'
+    for ky in out:
+        if '/' in ky:
+            nky = ky.replace('/', '-')
+        else:
+            nky = ky
+        dset.attrs[nky] = out[ky]
+    return dset
 
 
 def download(idx, deployment):
@@ -199,6 +231,6 @@ def load_from_web(idx, deployment):
             break
         time.sleep(0.1)
     data = read_cmist_zip(fname)
-    data['deployment'] = deployment
-    os.remove(fname)
+    data.attrs['deployment'] = deployment
+    data.attrs['_zipfilename_'] = fname
     return data

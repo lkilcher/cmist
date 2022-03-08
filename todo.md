@@ -1,6 +1,5 @@
 - Move the read deployment table code block from the `scrape_cmist.py` script, into the web_io tools.
   - Execute this when downloading data (to get time_range), rather than loading it from the index file. This way, you're always getting the latest data.
 - Once the above is done, we'll need some kind of tool to check that the data in `.cache/` is up to date compared to what is available online.
-- Change cache from `.mat` to `.nc` (use xarray?)?
 - After that, we should refactor the code to create local copies of all data.
 - After that, we should have a tool that scrape's the site, and updates the data if there is new data.

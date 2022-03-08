@@ -1,15 +1,15 @@
 import shutil
 from . import base
 import os
-from scipy.io import loadmat
 from .web_io import load_from_web
 from .base import station_index
+import xarray
 
 
 def load_from_cache(idx, deployment):
-    fname = base.cache_dir + idx + '.{:04d}.mat'.format(deployment)
+    fname = base.cache_dir + idx + '.{:04d}.nc'.format(deployment)
     if os.path.isfile(fname):
-        out = base.veldata(loadmat(fname, squeeze_me=True))
+        out = xarray.load_dataset(fname)
         out['time'] = out['time'].astype('datetime64[m]')
         return out
     return None
@@ -46,8 +46,15 @@ def get_station(idx, deployment='latest', force_reload=False):
         if data is not None:
             return data
     data = load_from_web(idx, deployment)
-    data._to_cache()
+    _to_cache(data)
     return data
+
+
+def _to_cache(dset):
+    outfile = base.cache_dir + '{}.{:04d}.nc'.format(dset.attrs['Station ID'], dset.attrs['deployment'])
+    dset.to_netcdf(outfile)
+    zfname = dset.attrs.pop('_zipfilename_')
+    os.remove(zfname)
 
 
 def reset_cache():
