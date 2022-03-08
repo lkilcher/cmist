@@ -18,7 +18,7 @@ except OSError:
     pass
 
 
-with file(data_root + 'coops_stations.json', 'r') as fl:
+with open(data_root + 'coops_stations.json', 'r') as fl:
     station_index = json.load(fl)
 
 

@@ -1,11 +1,10 @@
-from __future__ import print_function
 from selenium import webdriver
 import selenium.webdriver.remote.errorhandler as err
 from selenium.webdriver.support.ui import Select
 import zipfile
 import numpy as np
 import time
-import base
+from . import base
 import os
 
 
@@ -22,12 +21,22 @@ def get_driver():
     except:
         print('Reloading webdriver...', end=' ')
         # Start the webdriver
-        chromeOptions = webdriver.ChromeOptions()
-        prefs = {"download.default_directory": base.cache_dir}
-        chromeOptions.add_experimental_option("prefs", prefs)
-        drv = webdriver.Chrome(chrome_options=chromeOptions)
-        drv.get('https://cmist.noaa.gov/cmist/login.do')
-        drv.get('https://cmist.noaa.gov/cmist/ssl/public.do')
+        try:
+            chromeOptions = webdriver.ChromeOptions()
+            prefs = {"download.default_directory": base.cache_dir}
+            chromeOptions.add_experimental_option("prefs", prefs)
+            drv = webdriver.Chrome(chrome_options=chromeOptions)
+            drv.get('https://cmist.noaa.gov/cmist/login.do')
+            drv.get('https://cmist.noaa.gov/cmist/ssl/public.do')
+        except err.WebDriverException:
+            profile = webdriver.FirefoxProfile()
+            profile.set_preference('browser.download.folderList', 2)
+            profile.set_preference('browser.download.manager.showWhenStarting', False)
+            profile.set_preference("browser.download.dir", base.cache_dir)
+            profile.set_preference('browser.helperApps.neverAsk.saveToDisk', 'application/zip')
+            drv = webdriver.Firefox(profile)
+            drv.get('https://cmist.noaa.gov/cmist/login.do')
+            drv.get('https://cmist.noaa.gov/cmist/ssl/public.do')
         old_driver = False
         print('done.')
     if old_driver:
@@ -55,6 +64,7 @@ def read_metadata(fl):
     out = {}
     out['z'] = []
     for ln in fl:
+        ln = ln.decode('utf8')
         if len(ln) <= 2 or \
            ln.startswith('#') or \
            ln.startswith('Metadata'):
@@ -167,6 +177,7 @@ def download(idx, ):
 
 def load_from_web(idx):
     fname = download(idx)
+    print(fname)
     while True:
         if os.path.isfile(fname):
             break

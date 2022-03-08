@@ -1,6 +1,5 @@
-from __future__ import division
 import time
-import cPickle as pkl
+import pickle as pkl
 import json
 from collections import defaultdict
 import numpy as np
@@ -9,7 +8,7 @@ import copy
 
 
 def load_station_index():
-    with file('coops_stations-full.pkl', 'r') as fl:
+    with open('coops_stations-full.pkl', 'rb') as fl:
         data = pkl.load(fl)
     return data
 
@@ -17,7 +16,7 @@ def load_station_index():
 flag = defaultdict(lambda: False, {})
 #flag['scrape data'] = True
 #flag['process data'] = True
-flag['make kmz'] = True
+#flag['make kmz'] = True
 
 
 def most_common(lst):
@@ -32,8 +31,8 @@ if flag['scrape data']:
     ####
     # Start the chrome webdriver
     if 'drv' not in vars():
-        drv = webdriver.Chrome()
-        drv.get('http://cmist.noaa.gov')
+        drv = webdriver.Firefox()
+        drv.get('https://cmist.noaa.gov/cmist/login.do')
         drv.get('https://cmist.noaa.gov/cmist/ssl/public.do')
 
     ####
@@ -62,7 +61,10 @@ if flag['scrape data']:
     fulldat = {}
     for idx, code in enumerate(station_codes):
         drv.get('https://cmist.noaa.gov/cmist/requests/selectdata.do?stationid={}'.format(code))
-        head = drv.find_element_by_id('stationTable').find_elements_by_tag_name('td')
+        try:
+            head = drv.find_element_by_id('stationTable').find_elements_by_tag_name('td')
+        except err.NoSuchElementException:
+            continue
         rows = drv.find_element_by_id('deploymentTable').find_elements_by_tag_name('tr')
         fulldat[code] = dict(station_name=head[1].text.lstrip().rstrip(),
                              project=head[2].text.lstrip().rstrip(),
@@ -83,9 +85,9 @@ if flag['scrape data']:
 
     ####
     # Save the data
-    with file('coops_stations-full.pkl', 'w') as fl:
+    with open('coops_stations-full.pkl', 'wb') as fl:
         pkl.dump(fulldat, fl)
-    with file('coops_stations-full.json', 'w') as fl:
+    with open('coops_stations-full.json', 'w') as fl:
         json.dump(fulldat, fl, indent=4, sort_keys=True)
 
 else:
@@ -99,26 +101,28 @@ if flag['process data']:
 
     # This is a reprocessing step.
     procdat = copy.deepcopy(fulldat)
-    for tag, site in procdat.iteritems():
+    for tag, site in procdat.items():
         site['link'] = 'https://cmist.noaa.gov/cmist/requests/selectdata.do?stationid={}'.format(tag)
         # There are some typos in the source data:
         if tag == 'cb0801':
-            site['lonlat'][20][1] = site['lonlat'][19][1]
-            site['lonlat'][21][1] = site['lonlat'][19][1]
-            site['lonlat'][22][1] = site['lonlat'][19][1]
+            site['lonlat'][20] = site['lonlat'][19]
+            site['lonlat'][21] = site['lonlat'][19]
+            site['lonlat'][22] = site['lonlat'][19]
         elif tag == 'cb0402':
-            site['lonlat'][0][1] = site['lonlat'][2][1]
-            site['lonlat'][1][1] = site['lonlat'][2][1]
+            site['lonlat'][0] = site['lonlat'][2]
+            site['lonlat'][1] = site['lonlat'][2]
         elif tag == 'nb0201':
-            site['lonlat'][3][0] = site['lonlat'][0][0]
+            site['lonlat'][3] = site['lonlat'][0]
+        elif tag == 'mg0101':
+            site['lonlat'][0] = site['lonlat'][1]
 
         lonlat = np.array(site['lonlat']).T
         lonlat_ = lonlat.mean(1)
         if (np.abs((lonlat - lonlat_[:, None])) > 0.1).any():
             raise Exception("This is not one site!")
-        # site['deployments'] = dict(lonlat=site['lonlat'],
-        #                                   sensor=site['sensor'],
-        #                                   time_range=site['time_range'], )
+        site['deployments'] = dict(lonlat=site['lonlat'],
+                                   sensor=site['sensor'],
+                                   time_range=site['time_range'], )
         site['sensor'] = most_common(site['sensor'])
         site['lonlat'] = lonlat_.tolist()
         tmp = [0]
@@ -135,11 +139,11 @@ if flag['process data']:
         site['longest_record_days'] = max(tmp)
         site['nrecords'] = len(tmp) - 1
 
-    with file('coops_stations.json', 'w') as fl:
+    with open('coops_stations.json', 'w') as fl:
         json.dump(procdat, fl, indent=4, sort_keys=True)
 
 else:
-    with file('coops_stations.json', 'r') as fl:
+    with open('coops_stations.json', 'rb') as fl:
         procdat = json.load(fl)
 
 

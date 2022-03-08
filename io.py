@@ -1,8 +1,8 @@
 import shutil
-import base
+from . import base
 import os
 from scipy.io import loadmat
-from web_io import load_from_web
+from .web_io import load_from_web
 
 
 def load_from_cache(idx):
