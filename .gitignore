@@ -9,3 +9,4 @@ tmp/
 *flymake*
 geckodriver.log
 data/*-full.json
+fig/
