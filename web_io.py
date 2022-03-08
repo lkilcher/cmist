@@ -30,10 +30,15 @@ def get_driver():
             drv.get('https://cmist.noaa.gov/cmist/ssl/public.do')
         except err.WebDriverException:
             profile = webdriver.FirefoxProfile()
-            profile.set_preference('browser.download.folderList', 2)
-            profile.set_preference('browser.download.manager.showWhenStarting', False)
             profile.set_preference("browser.download.dir", base.cache_dir)
-            profile.set_preference('browser.helperApps.neverAsk.saveToDisk', 'application/zip')
+            profile.set_preference('browser.download.folderList', 2)
+            profile.set_preference('browser.helperApps.neverAsk.saveToDisk', 'application/octet-stream')
+            profile.set_preference("browser.download.manager.showWhenStarting", False)
+            profile.set_preference("browser.helperApps.alwaysAsk.force", False)
+            profile.set_preference("browser.download.manager.useWindow", False)
+            profile.set_preference("browser.download.manager.focusWhenStarting", False)
+            profile.set_preference("browser.download.manager.showAlertOnComplete", False)
+            profile.set_preference("browser.download.manager.closeWhenDone", True)
             drv = webdriver.Firefox(profile)
             drv.get('https://cmist.noaa.gov/cmist/login.do')
             drv.get('https://cmist.noaa.gov/cmist/ssl/public.do')
@@ -151,9 +156,20 @@ def read_cmist_zip(fname):
     return out
 
 
-def download(idx, ):
+def download(idx, deployment):
+    info = base.station_index[idx]
+    t_range = info['deployments']['time_range'][deployment - 1]
     drv = get_driver()
     drv.get(base.station_index[idx]['link'])
+    # Set the start time:
+    if t_range[0].upper() != 'N/A':
+        inp = drv.find_element_by_id("startDateTime")
+        inp.clear()
+        inp.send_keys(t_range[0])
+    if t_range[1].upper() != 'N/A':
+        inp = drv.find_element_by_id("endDateTime")
+        inp.clear()
+        inp.send_keys(t_range[1])
     # Set the datatype to get all data
     slct = Select(drv.find_element_by_name('datatype'))
     slct.select_by_visible_text('Speed/Direction/Ancillary Data')
@@ -175,13 +191,14 @@ def download(idx, ):
     return base.cache_dir + btn.text
 
 
-def load_from_web(idx):
-    fname = download(idx)
+def load_from_web(idx, deployment):
+    fname = download(idx, deployment)
     print(fname)
     while True:
         if os.path.isfile(fname):
             break
         time.sleep(0.1)
     data = read_cmist_zip(fname)
+    data['deployment'] = deployment
     os.remove(fname)
     return data

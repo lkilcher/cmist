@@ -14,8 +14,8 @@ def load_station_index():
 
 
 flag = defaultdict(lambda: False, {})
-#flag['scrape data'] = True
-flag['process data'] = True
+flag['scrape data'] = True
+#flag['process data'] = True
 #flag['make kmz'] = True
 
 
@@ -50,7 +50,7 @@ if flag['scrape data']:
             el = drv.find_element_by_link_text('Next 100')
         except err.NoSuchElementException:
             try:
-                el = drv.find_element_by_link_text('Last 63')
+                el = drv.find_element_by_partial_link_text("Last ")
             except err.NoSuchElementException:
                 break
         el.click()
@@ -85,8 +85,6 @@ if flag['scrape data']:
 
     ####
     # Save the data
-    with open('coops_stations-full.pkl', 'wb') as fl:
-        pkl.dump(fulldat, fl)
     with open('coops_stations-full.json', 'w') as fl:
         json.dump(fulldat, fl, indent=4, sort_keys=True)
 
@@ -136,7 +134,9 @@ if flag['process data']:
             tmp.append(dt.total_seconds() / 3600. / 24)
         site.pop('time_range')
         site['total_days'] = int(np.sum(tmp))
-        site['longest_record_days'] = max(tmp)
+        val = site['longest_record_days'] = max(tmp)
+        # We don't add 1 here, because tmp starts with a 0
+        site['longest_deployment'] = tmp.index(val)
         site['nrecords'] = len(tmp) - 1
 
     with open('coops_stations.json', 'w') as fl:

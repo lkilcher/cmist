@@ -28,7 +28,7 @@ class veldata(dict):
         savemat(fname, self)
 
     def _to_cache(self, ):
-        self.savemat(cache_dir + self.index + '.mat')
+        self.savemat(cache_dir + self.index + '.{:04d}.mat'.format(self['deployment']))
 
     def __getattr__(self, name):
         return self[name]
