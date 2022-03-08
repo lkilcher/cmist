@@ -1,0 +1,9 @@
+name: cmist
+dependencies:
+  - python=3.8
+  - numpy
+  - scipy
+  - matplotlib
+  - ipython
+  - pandas
+  - selenium
