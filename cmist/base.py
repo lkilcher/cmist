@@ -4,9 +4,9 @@ import json
 import numpy as np
 
 try:
-    pkg_root = os.path.dirname(os.path.realpath(__file__)) + '/'
+    pkg_root = os.path.normpath(os.path.dirname(os.path.realpath(__file__)) + '/../') + '/'
 except:
-    pkg_root = './'
+    pkg_root = '../'
 data_root = pkg_root + 'data/'
 cache_dir = pkg_root + '.cache/'
 
