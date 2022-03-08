@@ -15,7 +15,7 @@ def load_station_index():
 
 flag = defaultdict(lambda: False, {})
 #flag['scrape data'] = True
-#flag['process data'] = True
+flag['process data'] = True
 #flag['make kmz'] = True
 
 
@@ -135,7 +135,7 @@ if flag['process data']:
                                     '%Y-%m-%d %H:%M:%S'))
             tmp.append(dt.total_seconds() / 3600. / 24)
         site.pop('time_range')
-        site['total_days'] = np.sum(tmp)
+        site['total_days'] = int(np.sum(tmp))
         site['longest_record_days'] = max(tmp)
         site['nrecords'] = len(tmp) - 1
 
@@ -143,7 +143,7 @@ if flag['process data']:
         json.dump(procdat, fl, indent=4, sort_keys=True)
 
 else:
-    with open('coops_stations.json', 'rb') as fl:
+    with open('coops_stations.json', 'r') as fl:
         procdat = json.load(fl)
 
 
