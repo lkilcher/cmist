@@ -8,3 +8,6 @@ dependencies:
   - pandas
   - selenium
   - xarray
+  - pip
+  - pip:
+    - git+https://github.com/wesleybowman/UTide.git@master#egg=UTide
