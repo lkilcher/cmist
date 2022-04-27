@@ -5,7 +5,7 @@ import zipfile
 import numpy as np
 import time
 from . import base
-import os
+import os, shutil
 from xarray import Dataset
 
 
@@ -225,11 +225,22 @@ def download(idx, deployment):
 
 def load_from_web(idx, deployment):
     fname = download(idx, deployment)
-    print(fname)
-    while True:
+    # print(fname)
+    path, fname2 = os.path.split(fname)
+    fname2 = os.path.expanduser('~/Downloads/' + fname2)
+    # print(fname2)
+    n = 0
+    while n < 600:
+        # Wait for one minute 600 * 0.1 = 60seconds
+        # check if the file was actually downloaded to <user>/Downloads/
+        # This happens on MSWin, even though I don't think it should.
+        if os.path.isfile(fname2):
+            print("Moving file {}".format(fname2))
+            shutil.move(fname2, fname)
         if os.path.isfile(fname):
             break
         time.sleep(0.1)
+        
     data = read_cmist_zip(fname)
     data.attrs['deployment'] = deployment
     data.attrs['_zipfilename_'] = fname
