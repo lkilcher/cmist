@@ -25,3 +25,7 @@ Updating the index
 Every once-in-a-while you will want to update the `station_index` variable by running the `cmist/data/scrape_cmist.py` file. This will scour the cmist website for new datasets, and add them to the `station_index` variable, so that you can quickly see what's on there. I don't think you will be able to use the `get_station` function to retrieve data that is not in the `station_index` variable. So, if you see something on cmist website that you can't get with that function, try running the `scrape_cmist.py` script to update the `cmist/data/coops_stations.json` file (which is loaded in `cmist/base.py` as the `station_index` variable).
 
 Once you run that and generate the new `coops_stations.json` file, you can copy that file to the appropriate place in your venv to have an updated `station_index` file. Or, you can just update that file in the git source that your installing from (and reinstall if necessary).
+
+Common Error Messages
+------
+`Permission denied: 'geckodriver.log'` --- Change to a folder where you have write permissions (selenium is trying to create a log file and it can't).
