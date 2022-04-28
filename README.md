@@ -1,14 +1,27 @@
-Getting this package running
+This package can now be installed with pip:
 
-    conda env create -f environment.yml
-    
-You also need to install either the webdriver for Chrome, or for Firefox (i.e., [here](https://www.selenium.dev/documentation/webdriver/getting_started/install_drivers/)). To install these, place the executables somewhere on your path.
+    pip install git+https://github.com/lkilcher/cmist.git@master#egg=cmist-lib
 
-You'll want to place this folder on your python path somewhere.
+You also need to install either the webdriver for Chrome, or for Firefox (i.e., [here](https://www.selenium.dev/documentation/webdriver/getting_started/install_drivers/)). To install these, place the executables somewhere on your path. This can be:
 
-Once that is done, if you want the most up-to-date info on what is available on the cmist website, you'll want to run the `data/scrape_cmist.py` script. This will scour the cmist website to figure out what data is available, and that information will be available to you in the `cmist.station_index` variable.
+- On Windows: the root folder of the virtualenvironment (i.e., `<venv folder>/`)
+- On Mac/Linux: the `<venv folder>/bin/`
+- Or elsewhere on the system path.
 
 Now you should be able to load this library by doing:
 
     import cmist
     
+From there, you can load data from cmist by doing, for example:
+
+    data = cmist.get_station('COI1203')
+
+The cache
+------
+This package uses a local cache of files to store data locally after it has been downloaded. Each time you `import cmist` it will tell you where that folder is. Delete files in that folder to 'clear the cache' if necessary.
+
+Updating the index
+----
+Every once-in-a-while you will want to update the `station_index` variable by running the `cmist/data/scrape_cmist.py` file. This will scour the cmist website for new datasets, and add them to the `station_index` variable, so that you can quickly see what's on there. I don't think you will be able to use the `get_station` function to retrieve data that is not in the `station_index` variable. So, if you see something on cmist website that you can't get with that function, try running the `scrape_cmist.py` script to update the `cmist/data/coops_stations.json` file (which is loaded in `cmist/base.py` as the `station_index` variable).
+
+Once you run that and generate the new `coops_stations.json` file, you can copy that file to the appropriate place in your venv to have an updated `station_index` file. Or, you can just update that file in the git source that your installing from (and reinstall if necessary).

@@ -8,14 +8,14 @@ import copy
 
 
 def load_station_index():
-    with open('coops_stations-full.pkl', 'rb') as fl:
+    with open('coops_stations-full.json', 'rb') as fl:
         data = pkl.load(fl)
     return data
 
 
 flag = defaultdict(lambda: False, {})
 flag['scrape data'] = True
-#flag['process data'] = True
+flag['process data'] = True
 #flag['make kmz'] = True
 
 
@@ -85,7 +85,7 @@ if flag['scrape data']:
 
     ####
     # Save the data
-    with open('coops_stations-full.json', 'w') as fl:
+    with open('coops_stations-full.json', 'wb') as fl:
         json.dump(fulldat, fl, indent=4, sort_keys=True)
 
 else:

@@ -68,3 +68,4 @@ for st in stations:
                   )
 
     hist_fig.savefig('fig/{}-VelHist01.png'.format(st))
+    break
