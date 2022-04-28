@@ -13,12 +13,7 @@ except OSError:
 
 
 def _load_station_index():
-
-    print(__name__)
     stream = pkg_resources.resource_stream(__name__, 'data/coops_stations.json')
     return json.load(stream)
-    
-    # with open(data_root + 'coops_stations.json', 'r') as fl:
-    #     station_index = json.load(fl)
 
 station_index = _load_station_index()

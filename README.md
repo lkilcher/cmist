@@ -1,7 +1,7 @@
 This package can now be installed with pip:
 
-    pip install git+https://github.com/lkilcher/cmist.git@master#egg=cmist
-    
+    pip install git+https://github.com/lkilcher/cmist.git@master#egg=cmist-lib
+
 You also need to install either the webdriver for Chrome, or for Firefox (i.e., [here](https://www.selenium.dev/documentation/webdriver/getting_started/install_drivers/)). To install these, place the executables somewhere on your path. This can be:
 
 - On Windows: the root folder of the virtualenvironment (i.e., `<venv folder>/`)
