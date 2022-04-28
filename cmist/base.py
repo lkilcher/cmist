@@ -4,12 +4,14 @@ import json
 import numpy as np
 import pkg_resources
 
-cache_dir = os.path.normpath(os.path.dirname(os.path.realpath(__file__)) + '/../') + '/' + '.cache/'
+cache_dir = os.path.normpath(os.path.dirname(os.path.realpath(__file__)) + '/../') + '/' + '.cmist-cache/'
 
 try:
     os.mkdir(cache_dir)
 except OSError:
     pass
+
+print("The cmist-cache folder is: {}".format(cache_dir))
 
 
 def _load_station_index():
