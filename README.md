@@ -18,7 +18,7 @@ From there, you can load data from cmist by doing, for example:
 
 The cache
 ------
-This package uses a local cache of files to store data locally after it has been downloaded. Each time you `import cmist` it will tell you where that folder is. Delete files in that folder to 'clear the cache' if necessary.
+This package uses a local cache of files to store data locally after it has been downloaded. The cache will default to be `~/.cmist-lib/cache`, or you can specify it in a `~/.cmist-lib/config` file. That file should be formatted like [this](https://docs.python.org/3/library/configparser.html). Each time you `import cmist` it will tell you what folder is being used as the cache folder. Delete files in that folder to 'clear the cache' if necessary.
 
 Updating the index
 ----
