@@ -1,4 +1,4 @@
-__version__ = '0.1'
+__version__ = '0.1.1'
 __prog_name__ = 'cmist-lib'
 __version_date__ = 'April-27-2022'
 
