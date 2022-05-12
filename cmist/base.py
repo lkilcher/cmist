@@ -9,9 +9,9 @@ if os.path.isfile(os.path.expanduser('~/.cmist-lib/config')):
     config = ConfigParser()
     config.read('~/.cmist-lib/config')
     if 'cache_dir' in config:
-        cache_dir = config['cache_dir']
+        cache_dir = os.path.fullpath(os.path.expanduser(config['cache_dir'])) + '/'
 else:
-    cache_dir = os.path.expanduser('~/.cmist-lib/cache')
+    cache_dir = os.path.expanduser('~/.cmist-lib/cache') + '/'
 
 try:
     pkg_root = os.path.normpath(os.path.dirname(os.path.realpath(__file__)) + '/../') + '/'
