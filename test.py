@@ -33,24 +33,24 @@ stations = [
     # 'COI0509',
     # 'COI0510',
 #    'COI0511',
-    'COI1203',
-    'COI0419',
-    'COI0420',
-    'COI0512', # Iliamna Bay
-    'COI0514',
-    'COI0515',
-    'COI0516',
-    'COI1202',
-    'COI0513',
-    'COI0421',
-    'COI1201', # Homer spit
-    'COI0422',
-    'COI0515',
-    'COI0523',
-    'COI0524',
-    'COI0521',
-    'COI0418',
-    'COI0520',
+    # 'COI1203',
+    # 'COI0419',
+    # 'COI0420',
+    # 'COI0512', # Iliamna Bay
+    # 'COI0514',
+    # 'COI0515',
+    # 'COI0516',
+    # 'COI1202',
+    # 'COI0513',
+    # 'COI0421',
+     'COI1201', # Homer spit
+    # 'COI0422',
+    # 'COI0515',
+    # 'COI0523',
+    # 'COI0524',
+    # 'COI0521',
+    # 'COI0418',
+    # 'COI0520',
 ]
 
 for st in stations:
@@ -68,4 +68,6 @@ for st in stations:
                   )
 
     hist_fig.savefig('fig/{}-VelHist01.png'.format(st))
+    qs_fig.savefig('fig/{}-qsFig01.png'.format(st))
+
     break
