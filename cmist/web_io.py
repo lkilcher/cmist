@@ -1,6 +1,7 @@
 from selenium import webdriver
 import selenium.webdriver.remote.errorhandler as err
 from selenium.webdriver.support.ui import Select
+from selenium.webdriver.common.by import By
 import zipfile
 import numpy as np
 import time
@@ -195,25 +196,25 @@ def download(idx, deployment):
     drv.get(base.station_index[idx]['link'])
     # Set the start time:
     if t_range[0].upper() != 'N/A':
-        inp = drv.find_element_by_id("startDateTime")
+        inp = drv.find_element(By.ID,"startDateTime")
         inp.clear()
         inp.send_keys(t_range[0])
     if t_range[1].upper() != 'N/A':
-        inp = drv.find_element_by_id("endDateTime")
+        inp = drv.find_element(By.ID,"endDateTime")
         inp.clear()
         inp.send_keys(t_range[1])
     # Set the datatype to get all data
-    slct = Select(drv.find_element_by_name('datatype'))
+    slct = Select(drv.find_element(By.NAME,'datatype'))
     slct.select_by_visible_text('Speed/Direction/Ancillary Data')
     # Set the format to CSV:
-    slct = Select(drv.find_element_by_name('format'))
+    slct = Select(drv.find_element(By.NAME,'format'))
     slct.select_by_visible_text('CSV')
     # Now get the data:
-    elm = drv.find_element_by_id('submitBtn')
+    elm = drv.find_element(By.ID,'submitBtn')
     elm.click()
     while True:
         try:
-            btn = drv.find_element_by_class_name('btn-primary')
+            btn = drv.find_element(By.CLASS_NAME,'btn-primary')
             break
         except err.NoSuchElementException:
             # The button isn't here, so keep waiting...
@@ -225,13 +226,13 @@ def download(idx, deployment):
 
 def load_from_web(idx, deployment):
     fname = download(idx, deployment)
-    # print(fname)
+    #print(fname)
     path, fname2 = os.path.split(fname)
     fname2 = os.path.expanduser('~/Downloads/' + fname2)
-    # print(fname2)
+    print(fname2)
     n = 0
     while n < 600:
-        # Wait for one minute 600 * 0.1 = 60seconds
+        # Wait for one minute 600 * 0.1 = 60 seconds
         # check if the file was actually downloaded to <user>/Downloads/
         # This happens on MSWin, even though I don't think it should.
         if os.path.isfile(fname2):
@@ -239,6 +240,8 @@ def load_from_web(idx, deployment):
             shutil.move(fname2, fname)
         if os.path.isfile(fname):
             break
+        #print(n)    
+        n = n + 1
         time.sleep(0.1)
         
     data = read_cmist_zip(fname)
