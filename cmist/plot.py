@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 from .hist_scatter import scatter_hist_vel
-mpl.use('TkAgg')
 
 
 def quickshow(dset, fignum=None, figsize=[8, 6]):

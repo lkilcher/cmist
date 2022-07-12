@@ -1,4 +1,3 @@
-name: cmist
 dependencies:
   - python=3.8
   - numpy
